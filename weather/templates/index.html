@@ -7,77 +7,10 @@
         <title> 날씨 표시 - with django </title>
         <script src ="https://unpkg.com/vue"></script>
         <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-        <style>
-        *{
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-        }
-        
-        /* Style the header */
-        header {
-            background-color: rgb(226, 184, 228);
-            padding: 30px;
-            text-align: center;
-            font-size: 35px;
-            /* color: white; */
-        }
-        
-        /* Create two columns/boxes that floats next to each other */
-        nav {
-            float: left;
-            width: 30%;
-            height: 800px; /* only for demonstration, should be removed */
-            background: rgb(241, 218, 243);
-            padding: 20px;
-        }
-        
-        /* Style the list inside the menu */
-        nav ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        
-        article {
-            float: left;
-            padding: 20px;
-            width: 70%;
-            background-color: #f1f1f1;
-            height: 800px; /* only for demonstration, should be removed */
-        }
-        
-        /* Clear floats after the columns */
-        section:after {
-            content: "";
-            display: table;
-            clear: both;
-        }
-        
-        /* Style the footer */
-        footer {
-            background-color:rgb(226, 184, 228);
-            padding: 10px;
-            text-align: center;
-            color: white;
-        }
-        
-        /* Responsive layout - makes the two columns/boxes stack on top of each other instead of next to each other, on small screens */
-        @media (max-width: 600px) {
-            nav, article {
-            width: 100%;
-            height: auto;
-            }
-        }
-        .clear{
-            clear: left;
-        }
-        </style>
+        <link rel="stylesheet" href="{%static 'style.css'%}" />
     </head>
     <body>
         <div id="app">
-
             <header>
                 <h2 style="color:black; float:left;margin-right: 1000px;">날씨 표시 Application</h2>
                 <img v-bind:src='image'><br>
@@ -90,7 +23,7 @@
                 </nav>
                 <article>
                     <h3>Input City : </h3>
-                    <input v-model.lazy.trim="city" placeholder="도시명 입력(영어)">
+                    <input v-model.lazy.trim="city" placeholder="도시명 입력(영어)" v-on:keyup.enter="updateWeather">
                     <button v-on:click="updateWeather">확인</button>
                 
                     <h3>[[city]] 날씨 정보 : [[description]] </h3> 
@@ -102,13 +35,67 @@
                     </div>
                     
                     <div class="clear"></div>
-
                     <div>
-                        <p style="margin-left:20px">온도:&nbsp;&nbsp;&nbsp;&nbsp; [[temp]]</p>
-                    </div>
-
-                    <div class="clear"></div>
+                      <template v-if="Main=='Clear'">
+                          <div class="weather_image" style="background-image:url('https://bit.ly/2UxkSmj')">
+                              <h2 id="Loca">[[city]]</h2>
+                              <h1 id="Temp">[[temp]]<sup></sup></h1>
+                              <h2 id="Hum">습도:&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp[[humidity]] %</h2>
+                              <h2 id="wind">풍속:&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp[[windP]]&nbspMPH</h2>
+                          </div>
+                      </template>
+                      <template v-else-if="Main=='Rain'">
+                          <div class="weather_image" style="background-image:url('https://bit.ly/3biKp8M')">
+                              <h2 id="Loca">[[city]]</h2>
+                              <h1 id="Temp">[[temp]]<sup></sup></h1>
+                              <h2 id="Hum">습도:               &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp[[humidity]] %</h2>
+                              <h2 id="wind">풍속:              &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp[[windP]]&nbspMPH</h2>
+                          </div>
+                      </template>
+                       <template v-else-if="Main=='Clouds'">
+                          <div class="weather_image" style="background-image:url('https://bit.ly/2Uxv6CU')">
+                              <h2 id="Loca">[[city]]</h2>
+                              <h1 id="Temp">[[temp]]<sup></sup></h1>
+                              <h2 id="Hum">습도:               &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp[[humidity]] %</h2>
+                              <h2 id="wind">풍속:              &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp[[windP]]&nbspMPH</h2>
+                          </div>
+                      </template>
+                       <template v-else-if="Main=='Snow'">
+                          <div class="weather_image" style="background-image:url('https://bit.ly/2S30ffX')">
+                              <h2 id="Loca">[[city]]</h2>
+                              <h1 id="Temp">[[temp]]<sup></sup></h1>
+                              <h2 id="Hum">습도:               &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp[[humidity]] %</h2>
+                              <h2 id="wind">풍속:              &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp[[windP]]&nbspMPH</h2>
+                          </div>
+                      </template>
+                      
+                      <template v-else-if="Main=='Drizzle'">
+                        <div class="weather_image" style="background-image:url('http://bitly.kr/3lCWf6mHY9')">
+                            <h2 id="Loca">[[city]]</h2>
+                            <h1 id="Temp">[[temp]]<sup></sup></h1>
+                            <h2 id="Hum">습도:               &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp[[humidity]] %</h2>
+                            <h2 id="wind">풍속:              &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp[[windP]]&nbspMPH</h2>
+                        </div>
+                    </template>
                     
+                    <template v-else-if="Main=='Thunderstorm'">
+                      <div class="weather_image" style="background-image:url('http://bitly.kr/seNP0xk1eX')">
+                          <h2 id="Loca">[[city]]</h2>
+                          <h1 id="Temp">[[temp]]<sup></sup></h1>
+                          <h2 id="Hum">습도:               &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp[[humidity]] %</h2>
+                          <h2 id="wind">풍속:              &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp[[windP]]&nbspMPH</h2>
+                      </div>
+                  </template>
+                  
+                  <template v-else-if="Main=='Atmosphere'">
+                    <div class="weather_image" style="background-image:url('http://bitly.kr/N6i9KoTSl7')">
+                        <h2 id="Loca">[[city]]</h2>
+                        <h1 id="Temp">[[temp]]<sup></sup></h1>
+                        <h2 id="Hum">습도:               &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp[[humidity]] %</h2>
+                        <h2 id="wind">풍속:              &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp[[windP]]&nbspMPH</h2>
+                    </div>
+                </template>
+                  </div>
                     <div>
                         <p style="margin-left:20px;">위치 : </p>
                         <img :src="map_url" />
@@ -127,7 +114,7 @@
                 data:() =>{
                     return{
                     product:'test',
-                    image : "{% static 'img/ssafy.png' %}",
+                    image : "{% static 'img/weather.png' %}",
                     video :"{% static 'img/moon.mp4' %}",
                     description :'',
                     icon_url:'',
@@ -135,6 +122,9 @@
                     city:'Seoul',
                     weather:'',
                     temp:'',
+                    Main:'',
+                    humidity:'',
+                    windP:'1'
                     }
                 },
                 methods: {
@@ -142,10 +132,10 @@
                     return '//openweathermap.org/img/w/'+n+'.png';
                     },
                     getMapURL: function(city) {
-                    return 'https://maps.googleapis.com/maps/api/staticmap?center='+city+'&zoom=13&size=600x300&maptype=roadmap&key="your_key"';
+                    return 'https://maps.googleapis.com/maps/api/staticmap?center='+city+'&zoom=13&size=600x300&maptype=roadmap&key="yourkey"';
                     },
                     updateWeather: function() {
-                        var url = '//api.openweathermap.org/data/2.5/weather?q='+this.city+'&appid="your_key"';
+                        var url = '//api.openweathermap.org/data/2.5/weather?q='+this.city+'&appid="yourkey"';
                         axios.get(url).then(res => {
                             // console.log(JSON.stringify(res.data));
                             this.weather = res.data.weather;
@@ -161,6 +151,16 @@
                             temp = res.data.main;
                             console.log(temp)
                             this.temp = ''+(parseFloat(temp.temp)-273.15).toFixed(2) + '℃';
+
+                            this.Main = this.weather[0].main;
+                            console.log(this.Main)
+
+
+                            this.windP = res.data.wind.speed;
+                            console.log(this.windP);
+
+                            this.humidity = res.data.main.humidity;
+                            console.log(this.humidity);
                     });
                     }
                 }
