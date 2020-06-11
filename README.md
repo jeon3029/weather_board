@@ -6,5 +6,10 @@
 - [googlemap](https://cloud.google.com/maps-platform?hl=ko)
 - **소스코드에서 key부분 "your_key" 처리**
 
+## run command
+```shell
+$ python3 manage.py collectstatic #collect image files
+$ python3 manage.py runserver # run server
+```
 ## Sample image
 ![image](app_img.png)
