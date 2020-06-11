@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 import requests
 def index(request):
-    return render(request, 'index2.html')
+    return render(request, 'index.html')
     city = request.GET.get('city')
     # city = 'seoul'
     print(city)

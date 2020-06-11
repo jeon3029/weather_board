@@ -70,13 +70,17 @@
             height: auto;
             }
         }
+        .clear{
+            clear: left;
+        }
         </style>
     </head>
     <body>
-        <div id = "app">
+        <div id="app">
+
             <header>
                 <h2 style="color:black; float:left;margin-right: 1000px;">날씨 표시 Application</h2>
-                <img v-bind:src='image' v-if='image_show'><br>
+                <img v-bind:src='image'><br>
             </header>
             <section>
                 <nav>
@@ -85,65 +89,80 @@
                     </video>
                 </nav>
                 <article>
-                    <h1>{{city}}</h1>{{product}}
-                    <p>Input City : </p>
-                    <weather></weather>
+                    <h3>Input City : </h3>
+                    <input v-model.lazy.trim="city" placeholder="도시명 입력(영어)">
+                    <button v-on:click="updateWeather">확인</button>
+                
+                    <h3>[[city]] 날씨 정보 : [[description]] </h3> 
+                    <br>
+                    <text :text="city"></text>
+                    <div>
+                        <p style="margin-left:20px;float:left;">날씨 icon: </p>
+                        <img style="margin-left:10px;" :src="icon_url" /> 
+                    </div>
+                    
+                    <div class="clear"></div>
+
+                    <div>
+                        <p style="margin-left:20px">온도:&nbsp;&nbsp;&nbsp;&nbsp; [[temp]]</p>
+                    </div>
+
+                    <div class="clear"></div>
+                    
+                    <div>
+                        <p style="margin-left:20px;">위치 : </p>
+                        <img :src="map_url" />
+                    </div>
+                    
                   </article>
             </section>      
             <footer>
 				Designed By : <a href="https://github.com/jeon3029" >jeon3029</a>
 			</footer>          
-            <!-- <p> {{ product }} </p> -->
         </div>
-
         <script>
-            Vue.component('weather', {
-      template:`
-        <div>
-        <input v-model="city" placeholder="도시명">
-        <button v-on:click="updateWeather">확인</button>
-        <p v-for="w in weather">
-          description : {{w.description}} <br />
-          <img :src="icon_url" /> <br />
-          <img :src="map_url" />
-        </p>
-        </div>
-      `,
-      data : function() {
-        return {
-          city:'Seoul',
-          icon_url:'',
-          map_url:'',
-          weather:null,
-        }
-      },
-      methods: {
-        getIconURL: function(n) {
-          return '//openweathermap.org/img/w/'+n+'.png';
-        },
-        getMapURL: function(city) {
-          return 'https://maps.googleapis.com/maps/api/staticmap?center='+city+'&zoom=13&size=600x300&maptype=roadmap&key="your_key"';
-        },
-        updateWeather: function() {
-          var url = '//api.openweathermap.org/data/2.5/weather?q='+this.city+'&appid="your_key"';
-          axios.get(url).then(res => {
-            console.log(JSON.stringify(res.data));
-
-            this.weather = res.data.weather;
-            this.icon_url = this.getIconURL(this.weather[0].icon);
-            this.map_url = this.getMapURL(this.city);
-          });
-        }
-      }
-    });
-            var app = new Vue({
+            var vm = new Vue({
+                delimiters : ['[[',']]'],
                 el:"#app",
-                data:{
+                data:() =>{
+                    return{
                     product:'test',
                     image : "{% static 'img/ssafy.png' %}",
                     video :"{% static 'img/moon.mp4' %}",
-                    image_show: true,
-                    city:'Seoul'
+                    description :'',
+                    icon_url:'',
+                    map_url:'',
+                    city:'Seoul',
+                    weather:'',
+                    temp:'',
+                    }
+                },
+                methods: {
+                    getIconURL: function(n) {
+                    return '//openweathermap.org/img/w/'+n+'.png';
+                    },
+                    getMapURL: function(city) {
+                    return 'https://maps.googleapis.com/maps/api/staticmap?center='+city+'&zoom=13&size=600x300&maptype=roadmap&key="your_key"';
+                    },
+                    updateWeather: function() {
+                        var url = '//api.openweathermap.org/data/2.5/weather?q='+this.city+'&appid="your_key"';
+                        axios.get(url).then(res => {
+                            // console.log(JSON.stringify(res.data));
+                            this.weather = res.data.weather;
+                            console.log(this.weather)
+
+                            // console.log(this.weather[0].description)
+                            this.description = this.weather[0].description;
+                            // console.log(this.description)
+                            
+                            this.icon_url = this.getIconURL(this.weather[0].icon);
+                            this.map_url = this.getMapURL(this.city);
+                            
+                            temp = res.data.main;
+                            console.log(temp)
+                            this.temp = ''+(parseFloat(temp.temp)-273.15).toFixed(2) + '℃';
+                    });
+                    }
                 }
             });
         </script>
