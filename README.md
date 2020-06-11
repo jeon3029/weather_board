@@ -1,4 +1,5 @@
 # weather_board
+- made with django
 - Weather api를 이용해서 날씨 정보를 가져온다.
 
 ## 사용한 Api
